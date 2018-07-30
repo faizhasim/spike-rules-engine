@@ -17,10 +17,9 @@ libraryDependencies ++= Seq(
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
 
 
-  "org.flywaydb" %% "flyway-play" % "5.0.0",
   "com.typesafe.play" %% "play-slick" % slickVersion,
   "com.typesafe.play" %% "play-slick-evolutions" % slickVersion,
-//  "com.h2database" % "h2" % "1.4.197",
+
   "mysql" % "mysql-connector-java" % "8.0.11"
 )
 

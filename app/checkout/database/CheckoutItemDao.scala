@@ -1,6 +1,6 @@
 package checkout.database
 
-import checkout.models.CheckoutItem
+import checkout.models.CheckoutItemDto
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 
@@ -10,24 +10,23 @@ class CheckoutItemDao(dbConfig: DatabaseConfig[JdbcProfile]) {
   import dbConfig._
   import profile.api._
 
-  private class CheckoutItemTable(tag: Tag) extends Table[CheckoutItem](tag, "checkoutitem") {
+  private class CheckoutItemTable(tag: Tag) extends Table[CheckoutItemDto](tag, "checkoutitem") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
-    def customerId = column[Long]("customerId")
-    def productId = column[Long]("productId")
+    def customerId = column[String]("customerId")
+    def productId = column[String]("productId")
 
     def idxCustomerId = index("idx_customer_id", customerId)
-    def idxUniqueCustomerProduct = index("idx_unique_customer_product", (customerId, productId), unique = true)
 
-    override def * = (id, customerId, productId) <> ((CheckoutItem.apply _).tupled, CheckoutItem.unapply)
+    override def * = (id, customerId, productId) <> ((CheckoutItemDto.apply _).tupled, CheckoutItemDto.unapply)
   }
 
   private val checkoutTableRef = TableQuery[CheckoutItemTable]
 
-  def add(customerId: Long, productId: Long): Future[CheckoutItem] = db.run {
+  def add(customerId: String, productId: String): Future[CheckoutItemDto] = db.run {
     ( checkoutTableRef
           returning checkoutTableRef.map(_.id)
           into ((checkoutItem, id) => checkoutItem.copy(id = id))
-    ) += CheckoutItem(None, customerId, productId)
+    ) += CheckoutItemDto(None, customerId, productId)
   }
 
   def delete(id: Long): Future[Int] = db.run {
@@ -36,16 +35,27 @@ class CheckoutItemDao(dbConfig: DatabaseConfig[JdbcProfile]) {
       .delete
   }
 
-  def get(id: Long): Future[Option[CheckoutItem]] = db.run {
+  def get(id: Long): Future[Option[CheckoutItemDto]] = db.run {
     checkoutTableRef
       .filter(_.id === id)
       .result
       .headOption
   }
 
-  def listByCustomerId(customerId: Long): Future[Seq[CheckoutItem]] = db.run {
+  def listByCustomerId(customerId: String): Future[Seq[CheckoutItemDto]] = db.run {
     checkoutTableRef
       .filter(_.customerId === customerId)
+      .result
+  }
+
+  def productCountByCustomerId(customerId: String): Future[Seq[(String, Int)]] = db.run {
+    checkoutTableRef
+      .filter(_.customerId === customerId)
+      .sortBy(p => p.productId)
+      .groupBy(_.productId)
+      .map {
+        case (productId, group) => (productId, group.size)
+      }
       .result
   }
 

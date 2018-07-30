@@ -1,7 +1,6 @@
 import checkout.CheckoutModule
 import com.softwaremill.macwire._
 import controllers.Assets
-import org.flywaydb.play.FlywayPlayComponents
 import play.api.ApplicationLoader.Context
 import play.api.db.evolutions.EvolutionsComponents
 import play.api.db.slick.evolutions.SlickDBApi
@@ -30,12 +29,9 @@ class MainComponents(context: Context)
     with CheckoutModule
     with HttpFiltersComponents
     with I18nComponents with CSRFComponents with SecurityHeadersComponents
-    with SlickComponents with FlywayPlayComponents with EvolutionsComponents with HikariCPComponents
+    with SlickComponents with EvolutionsComponents with HikariCPComponents
     with controllers.AssetsComponents {
-  // flywayPlayInitializer
   applicationEvolutions
-
-  lazy val applicationController = new controllers.HomeController(controllerComponents) // manual wiring from template
 
   override lazy val assets: Assets = wire[Assets]
   lazy val prefix: String = "/"

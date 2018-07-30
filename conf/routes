@@ -3,9 +3,12 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
-# An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
-GET     /test                       checkout.controllers.CheckoutController.index
+DELETE  /checkout/items/$id<[0-9]+>                         checkout.controllers.CheckoutController.removeCheckoutItem(id: Long)
+GET     /checkout/items/$id<[0-9]+>                         checkout.controllers.CheckoutController.getCheckoutItem(id: Long)
+
+GET     /customers/:customerId/checkout/summary             checkout.controllers.CheckoutController.checkoutItemSummaryByCustomerId(customerId: String)
+GET     /customers/:customerId/checkout/items               checkout.controllers.CheckoutController.listCheckoutItemByCustomerId(customerId: String)
+POST    /customers/:customerId/checkout/items/:productId    checkout.controllers.CheckoutController.addCheckoutItem(customerId: String, productId: String)
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+# GET     /assets/*file                           controllers.Assets.versioned(path="/public", file: Asset)

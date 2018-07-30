@@ -1,16 +1,34 @@
-# Users schema
+# Checkout schema
 
 # --- !Ups
 
 CREATE TABLE checkoutitem (
     id bigint(20) NOT NULL AUTO_INCREMENT,
-    customerId bigint(255) NOT NULL,
-    productId bigint(255) NOT NULL,
+    customerId VARCHAR(32) NOT NULL,
+    productId VARCHAR(32) NOT NULL,
     PRIMARY KEY (id)
 );
-ALTER TABLE checkoutitem ADD UNIQUE idx_unique_customer_product(customerId, productId);
+
+CREATE TABLE pricingrules (
+    customerId VARCHAR(32) NOT NULL,
+    classicProductRule VARCHAR(255),
+    standoutProductRule VARCHAR(255),
+    premiumProductRule VARCHAR(255),
+    PRIMARY KEY (customerId)
+);
+
 ALTER TABLE checkoutitem ADD INDEX idx_customer_id (customerId);
+
+INSERT INTO pricingrules
+  (customerId, classicProductRule, standoutProductRule, premiumProductRule)
+VALUES
+  ('_', '{"productPrice":"269.99","strategy":"FlatRule"}', '{"productPrice":"322.99","strategy":"FlatRule"}', '{"productPrice":"394.99","strategy":"FlatRule"}'),
+  ('UNILEVER', '{"pay":2,"for":3,"strategy":"PayXForYRule"}', null, null),
+  ('APPLE', null, '{"productPrice":"299.99","strategy":"FlatRule"}', null),
+  ('NIKE', null, null, '{"productUnitAmount":4,"productPrice":"379.99","strategy":"EqualsOrMorePurchasedRule"}'),
+  ('FORD', '{"pay":5,"for":4,"strategy":"PayXForYRule"}', '{"productPrice":"309.99","strategy":"FlatRule"}', '{"productUnitAmount":3,"productPrice":"389.99","strategy":"EqualsOrMorePurchasedRule"}');
 
 # --- !Downs
 
 DROP TABLE checkoutitem;
+DROP TABLE pricingrules;
