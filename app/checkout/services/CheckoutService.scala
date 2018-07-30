@@ -23,5 +23,4 @@ class CheckoutService(checkoutItemDao: CheckoutItemDao) {
             case (k,v) => (k,v.map(_._2).head)
           }
       )
-//  def calculateTotalForCustomerId(customerId: String): Future[BigDecimal] = Future(BigDecimal("0.00"))
 }
