@@ -1,4 +1,4 @@
-# spike-rules-engine
+# spike-rules-engine [![CircleCI](https://circleci.com/gh/faizhasim/spike-rules-engine.svg?style=svg)](https://circleci.com/gh/faizhasim/spike-rules-engine)
 
 ![](https://goatsonline.weebly.com/uploads/3/0/8/1/30819681/4368283_orig.jpg)
 
