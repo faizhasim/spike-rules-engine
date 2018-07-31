@@ -18,20 +18,72 @@ jobs:
 
     steps:
       - checkout
+      - setup_remote_docker
+      - restore_cache:
+          keys:
+            - v1-docker-{{ .Branch }}
+          paths:
+            - ~/caches/app.tar
+
+      - run:
+          name: Load Docker image layer cache
+          command: |
+            set +o pipefail
+            docker load -i ~/caches/app.tar | true
+
+      - run:
+          name: Authenticate DockerHub
+          command: |
+            docker login -u ${DOCKERHUB_USERNAME} -p "${DOCKERHUB_PASSWORD}"
 
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "build.sbt" }}
+          - v1-m2dependencies-{{ checksum "build.sbt" }}
           # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+          - v1-m2dependencies-
 
       - run: cat /dev/null | sbt test:compile
 
       - save_cache:
           paths:
             - ~/.m2
-          key: v1-dependencies--{{ checksum "build.sbt" }}
+          key: v1-m2dependencies--{{ checksum "build.sbt" }}
 
       # run tests!
       - run: cat /dev/null | sbt test:test
+
+      - deploy:
+          name: Deploy to Dockerhub
+          command: |
+            sbt playUpdateSecret dist
+            pushd ./target/universal
+            rm -rf ./tmp ./dist
+            unzip ./spike-rules-engine-*.zip -d ./tmp
+            mv ./tmp/spike-rules-engine-* ./dist
+            rm -rf ./tmp
+            popd
+
+            docker build --cache-from=app -t app .
+
+      - run:
+          name: Save Docker image layer cache
+          command: |
+            mkdir -p ~/caches
+            docker save -o ~/caches/app.tar app
+
+      - save_cache:
+          key: v1-docker-{{ .Branch }}-{{ epoch }}
+          paths:
+            - ~/caches/app.tar
+
+      - deploy:
+          name: Push application Docker image
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              export DOCKER_IMAGE=faizhasim/spike-rules-engine
+              docker tag app "${DOCKER_IMAGE}:${CIRCLE_SHA1}"
+              docker tag app "${DOCKER_IMAGE}:latest"
+              docker push "${DOCKER_IMAGE}:${CIRCLE_SHA1}"
+              docker push "${DOCKER_IMAGE}:latest"
+            fi
