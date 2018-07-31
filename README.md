@@ -18,3 +18,8 @@
 2. Run
 
         sbt run
+        
+        
+## Running using the Docker image
+
+        curl -o- https://raw.githubusercontent.com/faizhasim/spike-rules-engine/master/hack/runviadocker.sh | bash

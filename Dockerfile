@@ -4,6 +4,6 @@ RUN apk add --update bash
 
 COPY ./target/universal/dist /app
 
-EXPOSE 8080
+EXPOSE 9000
 
-CMD bash /app/bin/spike-rules-engine -Dhttp.port=8080
+CMD bash /app/bin/spike-rules-engine -Dhttp.port=9000
