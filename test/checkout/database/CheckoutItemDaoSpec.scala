@@ -39,15 +39,13 @@ class CheckoutItemDaoSpec extends PlaySpec with ScalaFutures {
       val customerId = Random.nextString(5)
       val productId = ProductTypes.Classic.id
 
-      whenReady(checkoutItemDao.add(customerId, productId)) {newCheckoutItem => {
-        newCheckoutItem.customerId mustBe customerId
-        newCheckoutItem.productId mustBe productId
-        newCheckoutItem.id mustBe defined
+      val newCheckoutItem = Await.result(checkoutItemDao.add(customerId, productId), 5 seconds)
+      newCheckoutItem.customerId mustBe customerId
+      newCheckoutItem.productId mustBe productId
+      newCheckoutItem.id mustBe defined
 
-        whenReady(checkoutItemDao.get(newCheckoutItem.id.get)) {checkoutItem => {
-          checkoutItem.get mustBe newCheckoutItem
-        }}
-      }}
+      val checkoutItem = Await.result(checkoutItemDao.get(newCheckoutItem.id.get), 5 seconds)
+      checkoutItem.get mustBe newCheckoutItem
     }
 
     "be able to remove the result after adding `CheckoutItemDto`" in new InMemoryDatabaseForTest {
@@ -57,9 +55,7 @@ class CheckoutItemDaoSpec extends PlaySpec with ScalaFutures {
         checkoutItem <- checkoutItemDao.get(newCheckoutItem.id.get)
       ) yield checkoutItem
 
-      whenReady(f) { checkoutItem =>
-        checkoutItem mustBe None
-      }
+      Await.result(f, 5 seconds) mustBe None
     }
 
     "be able to list down checkout items for a specific customer" in new InMemoryDatabaseForTest {
@@ -72,9 +68,8 @@ class CheckoutItemDaoSpec extends PlaySpec with ScalaFutures {
         items <- checkoutItemDao.listByCustomerId(customerId)
       ) yield items
 
-      whenReady(operation) {items =>
-        items.size mustBe 3
-      }
+      val items = Await.result(operation, 5 seconds)
+      items.size mustBe 3
     }
 
     "list down correct product counts for a specific customer" in new InMemoryDatabaseForTest {
@@ -97,11 +92,10 @@ class CheckoutItemDaoSpec extends PlaySpec with ScalaFutures {
           }
       )
 
-      whenReady(operation) {productCounts =>
-        productCounts(ProductTypes.Classic.id) mustBe 1
-        productCounts(ProductTypes.Standout.id) mustBe 3
-        productCounts(ProductTypes.Premium.id) mustBe 2
-      }
+      val productCounts = Await.result(operation, 5 seconds)
+      productCounts(ProductTypes.Classic.id) mustBe 1
+      productCounts(ProductTypes.Standout.id) mustBe 3
+      productCounts(ProductTypes.Premium.id) mustBe 2
     }
   }
 }

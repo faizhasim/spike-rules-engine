@@ -9,7 +9,9 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
+import scala.language.postfixOps
 import scala.util.Random
 
 class CheckoutServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
@@ -50,13 +52,9 @@ class CheckoutServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       when(checkoutItemDao.get(m.anyLong())) thenReturn Future(None)
       when(checkoutItemDao.get(m.eq(idThatExist))) thenReturn Future(Some(expectedCheckoutItemDto))
 
-      whenReady(checkoutService.getItem(idThatExist)) {
-        _ mustBe Some(expectedCheckoutItemDto)
-      }
+      Await.result(checkoutService.getItem(idThatExist), 5 seconds) mustBe Some(expectedCheckoutItemDto)
 
-      whenReady(checkoutService.getItem(2L)) {
-        _ mustBe None
-      }
+      Await.result(checkoutService.getItem(2L), 5 seconds) mustBe None
     }
   }
 
@@ -71,14 +69,9 @@ class CheckoutServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
       when(checkoutItemDao.listByCustomerId(m.anyString())) thenReturn Future(List())
       when(checkoutItemDao.listByCustomerId(m.eq(customerIdThatExist))) thenReturn Future(expectedCheckoutItemDtos)
 
-      whenReady(checkoutService.listItemsByCustomerId(customerIdThatExist)) {
-        _ mustBe expectedCheckoutItemDtos
-      }
+      Await.result(checkoutService.listItemsByCustomerId(customerIdThatExist), 5 seconds) mustBe expectedCheckoutItemDtos
 
-      whenReady(checkoutService.listItemsByCustomerId(Random.nextString(6))) {
-        _ mustBe List()
-      }
-
+      Await.result(checkoutService.listItemsByCustomerId(Random.nextString(6)), 5 seconds) mustBe List()
     }
   }
 
@@ -98,14 +91,9 @@ class CheckoutServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
         item3
       ))
 
-      whenReady(checkoutService.productCountByCustomerId(customerId)) {
-        _ mustBe Map(item1, item2, item3)
-      }
+      Await.result(checkoutService.productCountByCustomerId(customerId), 5 seconds) mustBe Map(item1, item2, item3)
 
-      whenReady(checkoutService.productCountByCustomerId(Random.nextString(5))) {
-        _ mustBe Map()
-      }
-
+      Await.result(checkoutService.productCountByCustomerId(Random.nextString(5)), 5 seconds) mustBe Map()
     }
   }
 }
