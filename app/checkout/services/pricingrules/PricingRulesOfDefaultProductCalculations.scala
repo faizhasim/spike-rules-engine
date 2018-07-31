@@ -25,9 +25,9 @@ trait PricingRulesOfDefaultProductCalculations {
       .map(_.asInstanceOf[FlatRule])
     , 1 second)
 
-  private lazy val classicPricingRule: FlatRule = extractDefaultPricingRuleBlockingly(ProductTypes.Classic, BigDecimal("269.99"))
-  private lazy val standoutPricingRule: FlatRule = extractDefaultPricingRuleBlockingly(ProductTypes.Standout, BigDecimal("322.99"))
-  private lazy val premiumPricingRule: FlatRule = extractDefaultPricingRuleBlockingly(ProductTypes.Premium, BigDecimal("394.99"))
+  lazy val classicPricingRule: FlatRule = extractDefaultPricingRuleBlockingly(ProductTypes.Classic, BigDecimal("269.99"))
+  lazy val standoutPricingRule: FlatRule = extractDefaultPricingRuleBlockingly(ProductTypes.Standout, BigDecimal("322.99"))
+  lazy val premiumPricingRule: FlatRule = extractDefaultPricingRuleBlockingly(ProductTypes.Premium, BigDecimal("394.99"))
 
   def singleUnitPrice(product: ProductTypes.ProductType): BigDecimal = product match {
     case ProductTypes.Classic => BigDecimal(classicPricingRule.productPrice)
