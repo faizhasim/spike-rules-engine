@@ -11,15 +11,14 @@ import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
 class PricingRulesService(pricingRulesDao: PricingRulesDao, checkoutService: CheckoutService) {
-
-  val DefaultCustomerId = "_"
+  import PricingRulesService._
 
   private lazy val pricingRulesForDefaultCustomer: Future[Option[models.PricingRulesForCustomer]] = pricingRulesDao.listByCustomerId(DefaultCustomerId)
   private def extractDefaultPricingRuleBlockingly(product: ProductTypes.ProductType, defaultFlatRuleValue: BigDecimal): FlatRule = Await.result(
     pricingRulesForDefaultCustomer
       .map({
         case Some(pricingRulesForCustomer) => extractPricingRule(pricingRulesForCustomer, product)
-        case _ => throw new Exception("Default Pricing Rules information is missing from database.")
+        case _ => throw new PricingRulesException("Default Pricing Rules information is missing from database.")
       })
       .map(_.get)
       .filter(_.isInstanceOf[FlatRule])
@@ -44,7 +43,7 @@ class PricingRulesService(pricingRulesDao: PricingRulesDao, checkoutService: Che
   }).map(jsonString =>
     Json.parse(jsonString).validate[PricingRule] match {
       case s: JsSuccess[PricingRule] => s.get
-      case _: JsError => throw new Exception(s"Unable to parse JSON: $jsonString")
+      case _: JsError => throw new PricingRulesException(s"Unable to parse JSON: $jsonString")
     })
 
   private def calculateCostPerProduct(pricingRulesForCustomer: models.PricingRulesForCustomer, product: ProductTypes.ProductType, productIdCounts: Map[String, Int]) = {
@@ -102,7 +101,7 @@ class PricingRulesService(pricingRulesDao: PricingRulesDao, checkoutService: Che
         val standoutProductPrice = calculateCostPerProduct(pricingRulesForCustomer, ProductTypes.Standout, productIdCounts)
         val premiumProductPrice = calculateCostPerProduct(pricingRulesForCustomer, ProductTypes.Premium, productIdCounts)
         classicProductPrice + standoutProductPrice + premiumProductPrice
-      case _ => throw new Exception(s"Pricing rules for customer id $customerId not found.")
+      case _ => throw new PricingRulesException(s"Pricing rules for customer id $customerId not found.")
     })
 
     for (
@@ -110,4 +109,10 @@ class PricingRulesService(pricingRulesDao: PricingRulesDao, checkoutService: Che
       res <- calculateFromIdCountsResult(productIdCounts)
     ) yield res
   }
+}
+
+object PricingRulesService {
+  val DefaultCustomerId = "_"
+
+  private class PricingRulesException(message: String) extends Exception(message)
 }

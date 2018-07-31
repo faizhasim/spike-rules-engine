@@ -35,7 +35,7 @@ class CheckoutItemDaoSpec extends PlaySpec with ScalaFutures {
   }
 
   "CheckoutItemDao DB behaviours" should {
-    "get a result after adding it" in new InMemoryDatabaseForTest {
+    "get a result after adding `CheckoutItemDto`" in new InMemoryDatabaseForTest {
       val customerId = Random.nextString(5)
       val productId = ProductTypes.Classic.id
 
@@ -50,14 +50,16 @@ class CheckoutItemDaoSpec extends PlaySpec with ScalaFutures {
       }}
     }
 
-    "be able to remove the result after adding it" in new InMemoryDatabaseForTest {
-      whenReady(checkoutItemDao.add(Random.nextString(5), ProductTypes.Standout.id)) {newCheckoutItem => {
-        whenReady(checkoutItemDao.delete(newCheckoutItem.id.get)) {_ => {
-          whenReady(checkoutItemDao.get(newCheckoutItem.id.get)) { checkoutItem =>
-            checkoutItem mustBe None
-          }
-        }}
-      }}
+    "be able to remove the result after adding `CheckoutItemDto`" in new InMemoryDatabaseForTest {
+      val f = for (
+        newCheckoutItem <- checkoutItemDao.add(Random.nextString(5), ProductTypes.Standout.id);
+        _ <- checkoutItemDao.delete(newCheckoutItem.id.get);
+        checkoutItem <- checkoutItemDao.get(newCheckoutItem.id.get)
+      ) yield checkoutItem
+
+      whenReady(f) { checkoutItem =>
+        checkoutItem mustBe None
+      }
     }
 
     "be able to list down checkout items for a specific customer" in new InMemoryDatabaseForTest {
