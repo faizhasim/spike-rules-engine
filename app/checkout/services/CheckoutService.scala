@@ -20,7 +20,7 @@ class CheckoutService(checkoutItemDao: CheckoutItemDao) {
         _
           .groupBy(_._1)
           .map {
-            case (k,v) => (k,v.map(_._2).head)
+            case (k, v) => (k, v.map(_._2).head)
           }
       )
 }

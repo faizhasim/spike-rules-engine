@@ -24,6 +24,7 @@ libraryDependencies ++= Seq(
   "com.novocode" % "junit-interface" % "0.11" % Test,
   "ch.qos.logback" % "logback-classic" % "0.9.28" % Test,
   "org.mockito" % "mockito-core" % "2.20.1" % Test,
+  "com.h2database" % "h2" % "1.4.197" % Test,
 
   "mysql" % "mysql-connector-java" % "8.0.11"
 )

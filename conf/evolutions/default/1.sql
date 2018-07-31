@@ -2,22 +2,20 @@
 
 # --- !Ups
 
+
 CREATE TABLE checkoutitem (
-    id bigint(20) NOT NULL AUTO_INCREMENT,
+    id BIGINT(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     customerId VARCHAR(32) NOT NULL,
-    productId VARCHAR(32) NOT NULL,
-    PRIMARY KEY (id)
+    productId VARCHAR(32) NOT NULL
 );
+CREATE INDEX idx_customer_id ON checkoutitem (customerId);
 
 CREATE TABLE pricingrules (
-    customerId VARCHAR(32) NOT NULL,
+    customerId VARCHAR(32) PRIMARY KEY NOT NULL,
     classicProductRule VARCHAR(255),
     standoutProductRule VARCHAR(255),
-    premiumProductRule VARCHAR(255),
-    PRIMARY KEY (customerId)
+    premiumProductRule VARCHAR(255)
 );
-
-ALTER TABLE checkoutitem ADD INDEX idx_customer_id (customerId);
 
 INSERT INTO pricingrules
   (customerId, classicProductRule, standoutProductRule, premiumProductRule)

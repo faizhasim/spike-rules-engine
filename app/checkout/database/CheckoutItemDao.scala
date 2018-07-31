@@ -2,7 +2,7 @@ package checkout.database
 
 import checkout.models.CheckoutItemDto
 import slick.basic.DatabaseConfig
-import slick.jdbc.JdbcProfile
+import slick.jdbc.{JdbcBackend, JdbcProfile}
 
 import scala.concurrent.Future
 
@@ -59,4 +59,6 @@ class CheckoutItemDao(dbConfig: DatabaseConfig[JdbcProfile]) {
       .result
   }
 
+  private[database] def executeSlickOperation(fn: (JdbcBackend#DatabaseDef, TableQuery[CheckoutItemTable]) => Unit): Unit =
+    fn(db, checkoutTableRef)
 }
