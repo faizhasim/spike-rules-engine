@@ -16,7 +16,7 @@ import scala.util.Random
 class CheckoutItemDaoSpec extends PlaySpec with ScalaFutures {
   import slick.jdbc.H2Profile.api._
   trait InMemoryDatabaseForTest {
-    val dbConfig = DatabaseConfig.forConfig[JdbcProfile]("slick.dbs.test")
+    val dbConfig = DatabaseConfig.forConfig[JdbcProfile]("test.slickconfig")
     val checkoutItemDao = new CheckoutItemDao(dbConfig)
     checkoutItemDao.executeSlickOperation((db, table) => {
       val f = db

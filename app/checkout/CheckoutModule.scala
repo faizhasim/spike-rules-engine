@@ -2,6 +2,7 @@ package checkout
 
 import checkout.controllers.CheckoutController
 import checkout.database.{CheckoutItemDao, PricingRulesDao}
+import checkout.services.pricingrules.PriceCalculator
 import checkout.services.{CheckoutService, PricingRulesService}
 import com.softwaremill.macwire._
 import play.api.db.slick.SlickComponents
@@ -21,4 +22,5 @@ trait CheckoutModule extends SlickComponents {
   lazy val checkoutDao: CheckoutItemDao = wire[CheckoutItemDao]
   lazy val pricingRulesDao: PricingRulesDao = wire[PricingRulesDao]
   lazy val pricingRulesService: PricingRulesService = wire[PricingRulesService]
+  lazy val priceCalculator: PriceCalculator = wire[PriceCalculator]
 }

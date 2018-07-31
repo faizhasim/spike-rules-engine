@@ -3,17 +3,18 @@ package checkout.models
 import play.api.libs.json._
 
 sealed abstract class PricingRule
-case class PayXForYRule(pay: Int, `for`: Int, strategy: String = "PayXForYRule") extends PricingRule
-case class FlatRule(productPrice: String, strategy: String = "FlatRule") extends PricingRule
-case class EqualsOrMorePurchasedRule(productUnitAmount: Int, productPrice: String, strategy: String = "EqualsOrMorePurchasedRule") extends PricingRule
-
-
-object PayXForYRule {
-  implicit val format: OFormat[PayXForYRule] = Json.format[PayXForYRule]
+case class FlatRule(productPrice: String, strategy: String = "FlatRule") extends PricingRule {
+  def calculatePrice(count: Int): BigDecimal = count * BigDecimal(productPrice)
 }
+case class PayXForYRule(pay: Int, `for`: Int, strategy: String = "PayXForYRule") extends PricingRule
+case class EqualsOrMorePurchasedRule(productUnitAmount: Int, productPrice: String, strategy: String = "EqualsOrMorePurchasedRule") extends PricingRule
 
 object FlatRule {
   implicit val format: OFormat[FlatRule] = Json.format[FlatRule]
+}
+
+object PayXForYRule {
+  implicit val format: OFormat[PayXForYRule] = Json.format[PayXForYRule]
 }
 
 object EqualsOrMorePurchasedRule {
