@@ -11,6 +11,8 @@
 
 ## Getting Started
 
+### Running or Developing on your own machine with your own mysql
+
 1. Create DB
         
         create database goatzilla DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
@@ -20,6 +22,10 @@
         sbt run
         
         
-## Running using the Docker image
+### Running using [pre-build Docker image](https://hub.docker.com/r/faizhasim/spike-rules-engine/)
 
         curl -o- https://raw.githubusercontent.com/faizhasim/spike-rules-engine/master/hack/runviadocker.sh | bash
+
+## CD
+
+This project is build on [CircleCI](https://circleci.com/gh/faizhasim/spike-rules-engine) based on pipeline in [.circleci/config.yml](./.circleci/config.yml).
