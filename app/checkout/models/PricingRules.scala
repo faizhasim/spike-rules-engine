@@ -2,12 +2,38 @@ package checkout.models
 
 import play.api.libs.json._
 
-sealed abstract class PricingRule
+import scala.util.Try
+
+case class PricingRuleFailedValidation(message: String) extends Exception(message)
+
+sealed abstract class PricingRule {
+  def validate: Try[_ <: PricingRule]
+}
 case class FlatRule(productPrice: String, strategy: String = "FlatRule") extends PricingRule {
   def calculatePrice(count: Int): BigDecimal = count * BigDecimal(productPrice)
+
+  override def validate: Try[FlatRule] = Try {
+    val parsedValue = BigDecimal(productPrice)
+    if (parsedValue >= 0) this else throw PricingRuleFailedValidation(s"Product price must be greater or equal to 0.00. Captured value is $parsedValue.")
+  }
 }
-case class PayXForYRule(pay: Int, `for`: Int, strategy: String = "PayXForYRule") extends PricingRule
-case class EqualsOrMorePurchasedRule(productUnitAmount: Int, productPrice: String, strategy: String = "EqualsOrMorePurchasedRule") extends PricingRule
+
+case class PayXForYRule(pay: Int, `for`: Int, strategy: String = "PayXForYRule") extends PricingRule {
+  override def validate: Try[PayXForYRule] = Try {
+    if (pay >= 0 && `for` >= 0) this else throw PricingRuleFailedValidation("Both `pay` and `for` values must be positive integers.")
+  }
+}
+case class EqualsOrMorePurchasedRule(productUnitAmount: Int, productPrice: String, strategy: String = "EqualsOrMorePurchasedRule") extends PricingRule {
+  override def validate: Try[EqualsOrMorePurchasedRule] = Try {
+    BigDecimal(productPrice) match {
+      case parsedValue: BigDecimal if parsedValue < 0 =>
+        throw PricingRuleFailedValidation(s"Product price must be greater or equal to 0.00. Captured value is $parsedValue.")
+      case _: BigDecimal if productUnitAmount < 0 =>
+        throw PricingRuleFailedValidation("`productUnitAmount` must be positive a integer.")
+      case _: BigDecimal => this
+    }
+  }
+}
 
 object FlatRule {
   implicit val format: OFormat[FlatRule] = Json.format[FlatRule]

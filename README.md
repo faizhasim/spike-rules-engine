@@ -24,8 +24,14 @@
         
 ### Running using [pre-build Docker image](https://hub.docker.com/r/faizhasim/spike-rules-engine/)
 
-        curl -o- https://raw.githubusercontent.com/faizhasim/spike-rules-engine/master/hack/runviadocker.sh | bash
+To run:
 
-## CD
+        curl -o- https://raw.githubusercontent.com/faizhasim/spike-rules-engine/master/hack/runviadocker.sh | bash
+        
+To tear down resources created by script above:
+
+        curl -o- https://raw.githubusercontent.com/faizhasim/spike-rules-engine/master/hack/teardowndockerresources.sh | bash
+
+## CI/CD
 
 This project is build on [CircleCI](https://circleci.com/gh/faizhasim/spike-rules-engine) based on pipeline in [.circleci/config.yml](./.circleci/config.yml).
