@@ -53,8 +53,8 @@ jobs:
       # run tests!
       - run: cat /dev/null | sbt test:test
 
-      - deploy:
-          name: Deploy to Dockerhub
+      - run:
+          name: Build Docker app
           command: |
             sbt playUpdateSecret dist
             pushd ./target/universal
@@ -87,3 +87,10 @@ jobs:
               docker push "${DOCKER_IMAGE}:${CIRCLE_SHA1}"
               docker push "${DOCKER_IMAGE}:latest"
             fi
+
+      - run:
+          name: Run E2E Test
+          command: |
+            pushd e2etest
+            ./hack/runtest.sh
+            popd

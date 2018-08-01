@@ -1,0 +1,14 @@
+{
+  "name": "spike-rules-engine-e2etest",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "ava": "1.0.0-beta.6",
+    "got": "^8.3.2"
+  },
+  "scripts": {
+    "test": "npx ava test/*.spec.js"
+  }
+}
